@@ -85,12 +85,16 @@ app.UseExceptionHandler(appError =>
 
       if (contextFeature.Error.GetType().IsAssignableTo(typeof(AppException)))
       {
+        var myApp = app.Services.GetRequiredService<App>();
+
         var ex = (AppException)contextFeature.Error;
         context.Response.StatusCode = ex.HttpStatusCode;
         await context.Response.WriteAsync(new ErrorDetails()
         {
           StatusCode = ex.HttpStatusCode,
-          Message = ex.Message
+          Message = ex.Message,
+          CurrentUserId = myApp.CurrentUser?.Id,
+          CurrentUserName = myApp.CurrentUser?.Name 
         }.ToString());
       }
       else
@@ -104,15 +108,16 @@ app.UseExceptionHandler(appError =>
     }
   });
 });
-//app.UseExceptionTransform();
 
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseAuth();
+
 //app.UseMiddleware<ExceptionTransformMiddleware>();
-app.UseExceptionTransform();
+//app.UseExceptionTransform();
 
 app.MapControllers();
 app.Run();

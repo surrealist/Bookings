@@ -6,6 +6,9 @@ namespace GMM.Bookings.Models.DTOs
   {
     public int StatusCode { get; set; }
     public string Message { get; set; } = null!;
+    
+    public Guid? CurrentUserId { get; set; }
+    public string? CurrentUserName { get; set; }
 
     public override string ToString()
     {

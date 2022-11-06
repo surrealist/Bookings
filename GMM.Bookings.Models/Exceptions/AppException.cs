@@ -9,11 +9,15 @@ namespace GMM.Bookings.Models.Exceptions
   public abstract class AppException : ApplicationException
   {
     public int HttpStatusCode { get; }
-    public AppException(int httpStatusCode, 
-      string? message) : base(message)
+
+    public Guid? CurrentUserId { get; set; }
+    public string? CurrentUserName { get; set; }
+
+    public AppException(int httpStatusCode, string? message) : base(message)
     {
       HttpStatusCode = httpStatusCode;
     }
+     
   }
 
   public class NotFoundException : AppException

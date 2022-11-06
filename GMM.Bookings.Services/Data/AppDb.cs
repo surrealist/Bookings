@@ -11,5 +11,7 @@ namespace GMM.Bookings.Services.Data
     }
 
     public DbSet<Course> Courses { get; set; } = null!;
+
+    public DbSet<User> Users { get; set; } = null!;
   }
 }

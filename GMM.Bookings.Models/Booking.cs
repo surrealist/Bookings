@@ -15,5 +15,7 @@ namespace GMM.Bookings.Models
 
     public DateTimeOffset DateStart { get; set; }
     public DateTimeOffset DateEnd { get; set; }
+
+
   }
 }

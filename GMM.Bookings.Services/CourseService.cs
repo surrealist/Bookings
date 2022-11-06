@@ -39,8 +39,10 @@ namespace GMM.Bookings.Services
     public Course UpdateCourse(string id, UpdatedCourse item)
     { 
       var course = Find(id);
-      if (course == null) 
+      if (course == null)
+      {
         throw new NotFoundException($"Course {id} Not found");
+      }
 
       course.Name = item.Name;
       course.IsActive = item.IsActive;
