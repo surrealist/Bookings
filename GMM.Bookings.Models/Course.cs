@@ -22,6 +22,7 @@ namespace GMM.Bookings.Models
 
     public double Hours { get; set; }
 
-
+    public virtual ICollection<Booking> Bookings { get; set; }
+      = new HashSet<Booking>();
   }
 }

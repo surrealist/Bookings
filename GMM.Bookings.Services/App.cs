@@ -23,6 +23,7 @@ namespace GMM.Bookings.Services
 
       Courses = new CourseService(this);
       Students = new StudentService(this);
+      Bookings = new BookingService(this);
       _teacherService = new Lazy<TeacherService>(() => new TeacherService(this));
     }
 
@@ -32,6 +33,7 @@ namespace GMM.Bookings.Services
 
     public CourseService Courses { get; }
     public StudentService Students { get;  }
+    public BookingService Bookings { get; }
     public TeacherService Teachers => _teacherService.Value;
 
     public int SaveChanges() => db.SaveChanges();
@@ -44,7 +46,7 @@ namespace GMM.Bookings.Services
 
     public void SetCurrentUser(Guid id, string username, string role)
     {
-      var user = Users.All().SingleOrDefault(x => x.Id == id); // .Find(id);
+      var user = Users.Find(id);
       if (user == null)
       {
         user = new User

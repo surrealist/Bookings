@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace GMM.Bookings.Models.Exceptions
 {
-  public abstract class AppException : ApplicationException
+  public class AppException : ApplicationException
   {
     public int HttpStatusCode { get; }
 
