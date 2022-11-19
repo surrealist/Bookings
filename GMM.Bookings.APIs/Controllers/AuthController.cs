@@ -1,4 +1,5 @@
 ﻿using GMM.Bookings.Models.DTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -8,6 +9,7 @@ using System.Text;
 
 namespace GMM.Bookings.APIs.Controllers
 {
+
   [Route("api/v1/[controller]")]
   [ApiController]
   public class AuthController : ControllerBase
@@ -19,9 +21,45 @@ namespace GMM.Bookings.APIs.Controllers
       this.config = config;
     }
 
-    private (bool success, string roleName) ValidateUser(string username, string password)
+    private (bool success, string roleName, string username, Guid id)
+      ValidateUser(string username, string password)
     {
-      return (success: true, roleName: password);
+      switch (username)
+      {
+        case "alice":
+          return (
+            success: true, roleName: "student",
+            username: "Alice", id: new Guid("27AADA00-A47D-4ABE-81EE-6A3B844EED6F"));
+        case "bob":
+          return (true, "teacher", "Bob", new Guid("CBDF8478-D2D6-4615-A248-0DF9BED9A2BD"));
+        case "cathy":
+          return (true, "admin", "Cathy", new Guid("AF3634BD-21F6-460D-940C-84CCF79615F5"));
+        default:
+          return (false, "", "", new Guid());
+      }
+    }
+
+    [HttpGet] 
+    public ActionResult GetUserInfo()
+    {
+      var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+
+      if (isAuthenticated)
+      {
+        return Ok(new { 
+          isAuthenticated,
+          UserName = User.Identity!.Name,
+          Role = User.Claims.SingleOrDefault(x => x.Type == "gmm-role").Value,
+          Id = User.Claims.SingleOrDefault(x => x.Type == "gmm-id").Value,
+        });
+      }
+      else
+      {
+        return Ok(new
+        {
+          isAuthenticated
+        });
+      }
     }
 
     [HttpPost]
@@ -37,14 +75,15 @@ namespace GMM.Bookings.APIs.Controllers
         {
           Subject = new ClaimsIdentity(new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, item.Username), 
-                new Claim(JwtRegisteredClaimNames.Name, item.Username),
-                new Claim("role", result.roleName)
+                new Claim(JwtRegisteredClaimNames.Sub, result.username),
+                new Claim(JwtRegisteredClaimNames.Name, result.username),
+                new Claim("gmm-role", result.roleName),
+                new Claim("gmm-id", result.id.ToString()),
              }
           ),
           Expires = DateTime.UtcNow.AddDays(30),
           Issuer = issuer,
-          Audience = audience,            
+          Audience = audience,
           SigningCredentials = new SigningCredentials
             (new SymmetricSecurityKey(key),
             SecurityAlgorithms.HmacSha512Signature)
@@ -64,4 +103,4 @@ namespace GMM.Bookings.APIs.Controllers
 
 
   }
-} 
+}

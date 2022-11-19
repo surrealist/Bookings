@@ -1,4 +1,5 @@
-﻿using GMM.Bookings.Services;
+﻿using GMM.Bookings.Models;
+using GMM.Bookings.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GMM.Bookings.APIs.Middlewares
@@ -18,13 +19,19 @@ namespace GMM.Bookings.APIs.Middlewares
       if (httpContext != null && httpContext.User != null && httpContext.User.Identity != null
         && httpContext.User.Identity.IsAuthenticated)
       {
-        // TODO: consider find actually GUID of the current user.
-        var id = Guid.NewGuid(); 
-        var userName = httpContext.User.Identity.Name ?? "";
-        app.SetCurrentUser(id, userName);
+        // TODO: consider find actually GUID of the current user. 
+        var id = httpContext.User.Claims.SingleOrDefault(x => x.Type == "gmm-id");
+        
+        if (id != null)
+        {
+          var role = httpContext.User.Claims.SingleOrDefault(x => x.Type == "gmm-role");
+          var userName = httpContext.User.Identity!.Name;
+
+          app.SetCurrentUser(new Guid(id.Value), userName!, role!.Value);
+        }
       }
 
-      await _next(httpContext);
+      await _next(httpContext!);
     }
   }
 

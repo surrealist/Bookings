@@ -42,9 +42,9 @@ namespace GMM.Bookings.Services
     public void ResetNow() => Now = () => DateTimeOffset.Now;
     public DateTimeOffset Today() => Now().Date;
 
-    public void SetCurrentUser(Guid id, string username)
+    public void SetCurrentUser(Guid id, string username, string role)
     {
-      var user = Users.Find(id);
+      var user = Users.All().SingleOrDefault(x => x.Id == id); // .Find(id);
       if (user == null)
       {
         user = new User
@@ -52,6 +52,7 @@ namespace GMM.Bookings.Services
           Id = id,
           Name = username,
           CreatedDate = Now(),
+          Role = role,
           Note = null
         };
         Users.Add(user);

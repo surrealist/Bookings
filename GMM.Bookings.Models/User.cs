@@ -18,6 +18,11 @@ namespace GMM.Bookings.Models
     [StringLength(256)]
     public string Name { get; set; } = null!;
 
+    [Required]
+    [StringLength(256)]
+    public string Role { get; set; } = null!;
+
+
     public DateTimeOffset CreatedDate { get; set; }
 
     public string? Note { get; set; }

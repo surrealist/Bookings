@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Net;
 using System.Text;
 
@@ -63,6 +64,35 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddSwaggerGen(opt =>
+{
+  opt.SwaggerDoc("v1", new OpenApiInfo { Title = "GMM Bookings", Version = "v1" });
+  opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+  {
+    In = ParameterLocation.Header,
+    Description = "Please enter token",
+    Name = "Authorization",
+    Type = SecuritySchemeType.Http,
+    BearerFormat = "JWT",
+    Scheme = "bearer"
+  });
+
+  opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -94,7 +124,7 @@ app.UseExceptionHandler(appError =>
           StatusCode = ex.HttpStatusCode,
           Message = ex.Message,
           CurrentUserId = myApp.CurrentUser?.Id,
-          CurrentUserName = myApp.CurrentUser?.Name 
+          CurrentUserName = myApp.CurrentUser?.Name
         }.ToString());
       }
       else
